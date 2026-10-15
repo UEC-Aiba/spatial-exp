@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>オクターブ伸長の実験（調整法）</title>
+<title>空間知覚の実験：時間差と強度差</title>
 <style>
   :root { --text:#1B2A33; --title:#1A5276; --teal:#0E6E8A; --amber:#D1782F; --tint:#E3EFF4; --muted:#7B8C96; --line:#C9D6DC; --sub:#445A66; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -11,127 +11,158 @@
   body { font-family: Meiryo, "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif; max-width:560px; margin:0 auto;
     padding:max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
   h1 { font-size:20px; color:var(--title); margin:4px 0 2px; }
-  h2 { font-size:15px; color:var(--title); margin:10px 0 4px; }
+  h2 { font-size:16px; color:var(--title); margin:14px 0 6px; }
   .sub { font-size:13px; color:var(--sub); margin:0 0 10px; line-height:1.5; }
   p, li { font-size:15px; line-height:1.6; }
-  .card { background:var(--tint); border-radius:12px; padding:10px 12px 12px; margin-bottom:12px; }
-  .seg { display:grid; gap:6px; margin:4px 0 8px; }
-  .seg button { font:inherit; font-size:14px; font-weight:700; color:var(--teal); background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:9px 2px; touch-action:manipulation; cursor:pointer; }
-  .seg button[aria-pressed="true"] { background:var(--title); border-color:var(--title); color:#fff; }
-  .big { width:100%; font:inherit; font-size:17px; font-weight:700; color:#fff; background:var(--title); border:none; border-radius:12px; min-height:52px; margin:8px 0 0; touch-action:manipulation; cursor:pointer; }
-  .big.amber { background:var(--amber); } .big.ghost { background:#fff; color:var(--title); border:2px solid var(--teal); min-height:46px; font-size:15px; }
-  .fine { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:8px 0 2px; }
-  .fine button { font:inherit; font-size:14px; font-weight:700; color:var(--teal); background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:11px 2px; touch-action:manipulation; cursor:pointer; }
-  .sl { margin:12px 0 4px; } .sl input { width:100%; }
-  .sl .row { display:flex; justify-content:space-between; font-size:12px; color:var(--sub); }
-  .prog { font-size:13px; color:var(--sub); margin-bottom:4px; }
+  .warn { background:#FFF3E6; border:1.5px solid var(--amber); color:#8A4A12; border-radius:10px; padding:8px 10px; font-size:13px; line-height:1.5; margin-bottom:10px; }
+  .card { background:var(--tint); border-radius:12px; padding:12px; margin-bottom:12px; }
   .note { font-size:13px; line-height:1.6; color:var(--sub); background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px 10px; margin-bottom:12px; }
   .note ul { margin:4px 0 0; padding-left:1.2em; } .note li { font-size:13px; }
-  .sum { background:var(--tint); border-radius:12px; padding:10px 12px; margin-bottom:12px; }
-  .sum ul { list-style:none; margin:0; padding:0; } .sum li { padding:7px 0; border-bottom:1px solid #fff; font-size:15px; display:flex; gap:10px; align-items:flex-start; } .sum li:last-child { border-bottom:none; }
-  .ic { flex:none; width:30px; height:30px; border-radius:15px; background:var(--teal); color:#fff; font-weight:700; text-align:center; line-height:30px; font-size:14px; }
-  .ic.eq { background:var(--muted); } .ic.dn { background:var(--amber); }
+  button { font:inherit; touch-action:manipulation; cursor:pointer; }
+  .big { width:100%; font-size:17px; font-weight:700; color:#fff; background:var(--title); border:none; border-radius:12px; min-height:52px; margin:6px 0; }
+  .big.amber { background:var(--amber); } .big.ghost { background:#fff; color:var(--title); border:2px solid var(--teal); }
+  .tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:12px; }
+  .tabs button, .seg button { font-size:14px; font-weight:700; color:var(--teal); background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:10px 2px; }
+  .tabs button[aria-pressed="true"], .seg button[aria-pressed="true"] { background:var(--title); border-color:var(--title); color:#fff; }
+  .seg { display:grid; gap:6px; margin:6px 0 10px; }
+  canvas { width:100%; display:block; }
+  .panel { background:var(--tint); border-radius:12px; padding:8px 10px 6px; margin-bottom:10px; }
+  .panel h3 { font-size:12px; color:var(--sub); margin:0 0 2px; font-weight:600; }
+  .sl { margin:10px 0 4px; } .sl input { width:100%; }
+  .sl .row { display:flex; justify-content:space-between; font-size:12px; color:var(--sub); }
+  .sl .val { text-align:center; font-weight:700; color:var(--title); font-size:14px; }
+  .prog { font-size:13px; color:var(--sub); margin-bottom:6px; }
   .res { background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px; margin-bottom:10px; }
   .res h3 { font-size:15px; margin:0 0 4px; color:var(--title); }
-  canvas { width:100%; display:block; }
+  .sum { background:var(--tint); border-radius:12px; padding:10px 12px; margin-bottom:12px; }
+  .sum ul { list-style:none; margin:0; padding:0; } .sum li { padding:7px 0; border-bottom:1px solid #fff; font-size:15px; display:flex; gap:10px; align-items:flex-start; }
+  .sum li:last-child { border-bottom:none; }
+  .ic { flex:none; width:30px; height:30px; border-radius:15px; background:var(--teal); color:#fff; font-weight:700; text-align:center; line-height:30px; font-size:14px; }
+  .ic.no { background:var(--muted); } .ic.mid { background:var(--amber); }
   .legend { display:flex; flex-wrap:wrap; gap:4px 12px; font-size:12px; color:var(--sub); margin-top:4px; }
-  .legend i { display:inline-block; width:11px; height:11px; border-radius:6px; margin-right:4px; vertical-align:-1px; }
+  .legend i { display:inline-block; width:12px; height:12px; border-radius:6px; margin-right:4px; vertical-align:-1px; }
   textarea { width:100%; height:90px; font-size:12px; font-family:ui-monospace,monospace; }
   [hidden] { display:none !important; }
 </style>
 </head>
 <body>
-<h1>オクターブ伸長の実験（調整法）</h1>
-<p class="sub" id="lead">2つの音を続けて聴き，2つ目が，1つ目の「ちょうど1オクターブ上」に聞こえる高さに調整します。物理的なオクターブ（周波数が2倍）と，ずれるかどうかを調べます。</p>
+<h1>空間知覚の実験：時間差と強度差</h1>
+<p class="sub" id="lead">ヘッドホンで、左右の耳に届く音の「時間差（ITD）」と「強度差（IID）」を変えて、頭の中の音の位置（頭内定位）が動くかを確かめます。</p>
+<div class="warn"><b>必ずイヤホン（ヘッドホン）を使ってください。</b>左右の音が混ざるスピーカーでは、正しく体験できません。</div>
 
-<section id="scrStart">
-  <div class="card">
-    <h2 style="margin-top:0">標準音の周波数（複数選択）</h2>
-    <div class="seg" id="freqSel" style="grid-template-columns:repeat(3,1fr)"></div>
-    <p class="sub" style="margin:0">標準音は低い方の音で，聴かせるたびに繰り返されます。調整する音は，その1オクターブ上あたりです。</p>
-    <p class="sub" id="count" style="margin:8px 0 0; font-weight:700; color:var(--title)"></p>
-  </div>
-  <div class="card">
-    <button class="big ghost" id="btnVol" type="button" style="margin-top:0">音量あわせ（1000 Hz の音）</button>
-    <p class="sub" style="margin:6px 0 0">「小さめだが，はっきり聞こえる」音量にして，このあとは変えないでください。</p>
-  </div>
-  <div class="note"><b>やり方</b>
-    <ul>
-      <li>音は，低い音（標準音）と高い音（調整する音）が，この順に，繰り返し鳴ります。</li>
-      <li>スライダーやボタンで，高い音の高さを変えます（数値は表示されません）。</li>
-      <li>高い音が，低い音の<b>ちょうど1オクターブ上</b>（同じ音の，高い版）に聞こえたら，「決定」を押します。</li>
-      <li>音楽経験がなくても，「似ていて，高い音」に聞こえるところを探せば大丈夫です。</li>
-    </ul>
-  </div>
-  <button class="big" id="btnStart" type="button">実験を始める</button>
-  <div class="note" style="margin-top:12px"><b>注意</b>
-    <ul>
-      <li>音量は小さめから始め，途中で変えないでください。イヤホン（ヘッドホン）を推奨します。</li>
-      <li>iPhone はマナーモードを解除してください。</li>
-    </ul>
-  </div>
-</section>
+<div class="tabs" id="tabs">
+  <button type="button" data-t="free" aria-pressed="true">さわってみる</button>
+  <button type="button" data-t="meas" aria-pressed="false">測ってみる</button>
+</div>
 
-<section id="scrTrial" hidden>
-  <div class="prog" id="prog"></div>
+<!-- ======================= 共通：準備 ======================= -->
+<div class="card" id="prep">
+  <h2 style="margin-top:0">準備</h2>
+  <button class="big ghost" id="btnCheck" type="button">① 左右のチェック（左→右の順に鳴ります）</button>
+  <button class="big ghost" id="btnVol" type="button">② 音量あわせ（両耳に同じ音）</button>
+  <p class="sub" style="margin:4px 0 0">音量は「小さめだがはっきり聞こえる」程度にして、このあとは変えないでください。</p>
+</div>
+
+<!-- ======================= さわってみる ======================= -->
+<section id="free">
   <div class="card">
-    <button class="big" id="btnPlay" type="button">■ 止める</button>
+    <h2 style="margin-top:0">音の種類</h2>
+    <div class="seg" id="stimF" style="grid-template-columns:repeat(2,1fr)"></div>
     <div class="sl">
-      <div class="row"><span>← 高い音が，低くなる</span><span>高くなる →</span></div>
-      <input type="range" id="adj" min="-12" max="12" step="0.05" value="0" aria-label="高い音の高さ">
+      <div class="row"><span>← 左耳が先</span><span>右耳が先 →</span></div>
+      <input type="range" id="itd" min="-800" max="800" step="10" value="0" aria-label="時間差">
+      <div class="val" id="itdv"></div>
     </div>
-    <div class="fine">
-      <button type="button" data-d="-1">−大</button><button type="button" data-d="-0.2">−小</button>
-      <button type="button" data-d="0.2">＋小</button><button type="button" data-d="1">＋大</button>
+    <div class="sl">
+      <div class="row"><span>← 左耳が大きい</span><span>右耳が大きい →</span></div>
+      <input type="range" id="iid" min="-20" max="20" step="1" value="0" aria-label="強度差">
+      <div class="val" id="iidv"></div>
     </div>
-    <p class="sub" style="margin:4px 0 0">「ちょうど1オクターブ上」に聞こえるところで，決定してください。</p>
-    <button class="big" id="btnDecide" type="button">この高さで決定</button>
+    <button class="big" id="btnPlay" type="button">▶ 鳴らす</button>
+    <button class="big ghost" id="btnZero" type="button">時間差・強度差を 0 にもどす</button>
+  </div>
+  <div class="panel"><h3>左右の耳に届く波形（約6 ms）</h3><canvas id="wave" style="height:130px"></canvas></div>
+  <div class="note"><b>試してみよう</b>
+    <ul>
+      <li><b>500 Hz</b> で時間差を動かす → 頭の中の音の位置は動く？</li>
+      <li><b>4000 Hz</b> で時間差を動かす → 同じように動く？</li>
+      <li><b>4000 Hz</b> で強度差を動かす → 動く？</li>
+      <li><b>4000 Hz（振幅変調）</b>で時間差を動かす → 動く？</li>
+    </ul>
   </div>
 </section>
 
-<section id="scrResult" hidden>
-  <h2 style="margin-top:0">結果（まとめ）</h2>
-  <div class="sum" id="summary"></div>
-  <h2>くわしい結果</h2>
-  <div class="res"><h3>標準音の周波数と，オクターブ伸長</h3><canvas id="chart" style="height:220px"></canvas>
-    <div class="legend"><span><i style="background:#0E6E8A"></i>低い方から合わせた</span><span><i style="background:#D1782F"></i>高い方から合わせた</span><span><i style="background:#1A5276"></i>平均</span></div>
-    <p class="sub" style="margin:4px 0 0">横軸：標準音の周波数／縦軸：心理的オクターブの，物理的オクターブ（2倍）からのずれ（%）。0 より上なら，伸長。</p></div>
-  <div class="note"><b>見方</b>
-    <ul>
-      <li>大串（2019）の図6-4では，伸長は，低い周波数ではわずか（約0〜1%），2 kHz付近で約2〜3%です。</li>
-      <li>平均では約20セント（約1.2%）という報告があります（Ward, 1954；Dobbins & Cuddy, 1982）。1%は，約17セントです。</li>
-      <li>個人差が大きく，ほとんど伸長しない人や，逆向きの人もいます。</li>
-      <li>この実験は，簡易版です。試行数が少ないので，結果は大きくばらつきます。</li>
-    </ul>
+<!-- ======================= 測ってみる ======================= -->
+<section id="meas" hidden>
+  <div id="mSet">
+    <div class="card">
+      <h2 style="margin-top:0">測る手がかり（複数選択）</h2>
+      <div class="seg" id="cueM" style="grid-template-columns:repeat(2,1fr)"></div>
+      <h2>音の種類（複数選択）</h2>
+      <div class="seg" id="stimM" style="grid-template-columns:repeat(2,1fr)"></div>
+      <p class="sub" style="margin:0">音を聴いて、<b>頭の中のどこ</b>に聞こえるかをスライダーで答えます（左端〜右端）。</p>
+      <p class="sub" id="count" style="margin:8px 0 0; font-weight:700; color:var(--title)"></p>
+    </div>
+    <button class="big" id="btnStart" type="button">測定を始める</button>
   </div>
-  <button class="big ghost" id="btnCopy" type="button">結果をコピー（CSV）</button>
-  <textarea id="csv" hidden readonly></textarea>
-  <button class="big" id="btnAgain" type="button">もう一度やる</button>
+  <div id="mTrial" hidden>
+    <div class="prog" id="prog"></div>
+    <button class="big ghost" id="btnReplay" type="button">▶ もう一度聴く</button>
+    <div class="sl">
+      <div class="row"><span>← 左耳のそば</span><span>頭の中央（0）</span><span>右耳のそば →</span></div>
+      <input type="range" id="rate" min="-5" max="5" step="0.1" value="0" aria-label="聞こえた位置">
+    </div>
+    <button class="big" id="btnOk" type="button">この位置に聞こえた（決定）</button>
+  </div>
+  <div id="mRes" hidden>
+    <h2 style="margin-top:0">結果（まとめ）</h2>
+    <div class="sum" id="summary"></div>
+    <h2>くわしい結果</h2>
+    <div id="charts"></div>
+    <div class="note" id="interp"></div>
+    <button class="big ghost" id="btnCopy" type="button">結果をコピー（CSV）</button>
+    <textarea id="csv" hidden readonly></textarea>
+    <button class="big" id="btnAgain" type="button">もう一度やる</button>
+  </div>
 </section>
+
+<div class="note"><b>注意</b>
+  <ul>
+    <li>イヤホン（ヘッドホン）で聴いてください。</li>
+    <li>iPhone はマナーモードを解除してください。</li>
+    <li>音量は小さめから始め、途中で変えないでください。</li>
+  </ul>
+</div>
 
 <script>
 (() => {
+  // ---------------- stimuli ----------------
+  const STIM = {
+    t500:  { name: '500 Hz 純音', short: '500 Hz', base: -34 },
+    t4k:   { name: '4000 Hz 純音', short: '4000 Hz', base: -40 },
+    am4k:  { name: '4000 Hz 純音（振幅変調）', short: '4000 Hz 振幅変調', base: -40 },
+    noise: { name: '広帯域ノイズ', short: 'ノイズ', base: -38 },
+  };
+  const SORDER = ['t500', 't4k', 'am4k', 'noise'];
+  const COLORS = { t500: '#0E6E8A', t4k: '#D1782F', am4k: '#7B8C96', noise: '#1A5276' };
+  const CUE = { itd: { name: '時間差（ITD）', levels: [-600, -300, 0, 300, 600], unit: 'μs' }, iid: { name: '強度差（IID）', levels: [-12, -6, 0, 6, 12], unit: 'dB' } };
+  const CORDER = ['itd', 'iid'];
+  let REPS = 2;
   const el = id => document.getElementById(id);
-  const FREQS = [500, 1000, 2000], REPS = 2, STARTS = [-5, 5];       // start offsets (%) of the adjusted tone from 2 x standard
-  const sel = new Set([500, 2000]);
-  const BASE_DB = -34, TONE = 0.45, GAP = 0.15, CYCLE = 2.0;
+  const dbToGain = db => Math.pow(10, db / 20);
 
-  // ---- ISO 226:2003 40-phon contour, used only to equalize loudness of the tones
-  const ISO = (() => {
-    const F = [20,25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500];
-    const A = [.532,.506,.480,.455,.432,.409,.387,.367,.349,.330,.315,.301,.288,.276,.267,.259,.253,.250,.246,.244,.243,.243,.243,.242,.242,.245,.254,.271,.301];
-    const LU = [-31.6,-27.2,-23.0,-19.1,-15.9,-13.0,-10.3,-8.1,-6.2,-4.5,-3.1,-2.0,-1.1,-.4,0,.3,.5,0,-2.7,-4.1,-1.0,1.7,2.5,1.2,-2.1,-7.1,-11.2,-10.7,-3.1];
-    const TF = [78.5,68.7,59.5,51.1,44.0,37.5,31.5,26.5,22.1,17.9,14.4,11.4,8.6,6.2,4.4,3.0,2.2,2.4,3.5,1.7,-1.3,-4.2,-6.0,-5.4,-1.5,6.0,12.6,13.9,12.3];
-    const spl = F.map((f, i) => { const Af = 4.47e-3 * (Math.pow(10, 0.025 * 40) - 1.15) + Math.pow(0.4 * Math.pow(10, (TF[i] + LU[i]) / 10 - 9), A[i]); return (10 / A[i]) * Math.log10(Af) - LU[i] + 94; });
-    return f => { if (f <= F[0]) return spl[0]; if (f >= F[F.length - 1]) return spl[spl.length - 1]; let i = 0; while (F[i + 1] < f) i++; const r = (Math.log(f) - Math.log(F[i])) / (Math.log(F[i + 1]) - Math.log(F[i])); return spl[i] + r * (spl[i + 1] - spl[i]); };
-  })();
-  const levelDb = f => BASE_DB + Math.max(-6, Math.min(10, ISO(f) - 40));       // roughly equal loudness, never too loud
-
-  // ---- audio
-  let ctx = null, master = null;
+  // ---------------- audio engine ----------------
+  // Stereo AudioBuffers are generated in JavaScript (exact delays and gains per ear) and played directly.
+  // No ChannelMerger / DelayNode routing is used, so left and right are always played as written.
+  let ctx = null, master = null, noiseArr = null, noiseSr = 0;
   function ensureAudio() {
-    if (!ctx) { const AC = window.AudioContext || window.webkitAudioContext; ctx = new AC(); master = ctx.createGain(); const comp = ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination); }
-    unlockIOS(); if (ctx.state !== 'running') ctx.resume().catch(() => {});
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      ctx = new AC(); master = ctx.createGain(); master.gain.value = 1;
+      const comp = ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination);
+    }
+    unlockIOS();
+    if (ctx.state !== 'running') ctx.resume().catch(() => {});
   }
   let unlocked = false;
   function unlockIOS() {
@@ -143,95 +174,259 @@
       wr(0, 'RIFF'); dv.setUint32(4, 36 + n, true); wr(8, 'WAVEfmt '); dv.setUint32(16, 16, true);
       dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, sr, true); dv.setUint32(28, sr, true);
       dv.setUint16(32, 1, true); dv.setUint16(34, 8, true); wr(36, 'data'); dv.setUint32(40, n, true); buf.fill(128, 44);
-      const a = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }))); a.loop = true; a.setAttribute('playsinline', ''); a.play().catch(() => {});
+      const a = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
+      a.loop = true; a.setAttribute('playsinline', ''); a.play().catch(() => {});
     } catch (e) {}
   }
-  let handles = [];
-  function tone(c, dest, f, when, dur) {
-    const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f;
-    const g = c.createGain(), a = Math.SQRT2 * Math.pow(10, levelDb(f) / 20);
-    g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(a, when + 0.02); g.gain.setValueAtTime(a, when + dur - 0.03); g.gain.linearRampToValueAtTime(0, when + dur);
-    o.connect(g); g.connect(dest); o.start(when); o.stop(when + dur + 0.02); return { o, g };
+  const GATE_RAMP = 0.02;
+  function filteredNoise(sr) {                       // 3 s of white noise, low-passed at 6 kHz, RMS = 1
+    if (noiseArr && noiseSr === sr) return noiseArr;
+    const n = Math.round(sr * 3), w = new Float32Array(n);
+    let sd = 12345; for (let i = 0; i < n; i++) { sd = (sd * 1664525 + 1013904223) >>> 0; w[i] = (sd / 4294967296) * 2 - 1; }
+    const K = Math.tan(Math.PI * 6000 / sr), q = Math.SQRT1_2, nm = 1 / (1 + K / q + K * K);
+    const b0 = K * K * nm, b1 = 2 * b0, b2 = b0, a1 = 2 * (K * K - 1) * nm, a2 = (1 - K / q + K * K) * nm;
+    let x1 = 0, x2 = 0, y1 = 0, y2 = 0, sum = 0;
+    for (let i = 0; i < n; i++) { const x = w[i], y = b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x; y2 = y1; y1 = y; w[i] = y; sum += y * y; }
+    const rms = Math.sqrt(sum / n); for (let i = 0; i < n; i++) w[i] /= rms;
+    noiseArr = w; noiseSr = sr; return w;
   }
-  const upperFreq = (S, pct) => 2 * S * (1 + pct / 100);                       // adjusted tone, from the slider value (% deviation from 2S)
+  // left/right signals of one burst: itdUs > 0 means the RIGHT ear leads (the left signal is delayed); iidDb > 0 means the right ear is louder
+  function makeSignals(sr, key, itdUs, iidDb, dur) {
+    const N = Math.round(sr * (dur + 0.006)), L = new Float32Array(N), R = new Float32Array(N);
+    const rms = dbToGain(STIM[key].base);
+    const dL = Math.max(0, itdUs) / 1e6, dR = Math.max(0, -itdUs) / 1e6;
+    const gL = dbToGain(-iidDb / 2), gR = dbToGain(iidDb / 2);
+    let noise = null, off = 0;
+    if (key === 'noise') { noise = filteredNoise(sr); off = 2000 + Math.floor(Math.random() * (noise.length - N - 4000)); }
+    const sig = tt => {
+      if (key === 't500') return Math.SQRT2 * Math.sin(2 * Math.PI * 500 * tt);
+      if (key === 't4k') return Math.SQRT2 * Math.sin(2 * Math.PI * 4000 * tt);
+      if (key === 'am4k') return Math.SQRT2 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 100 * tt)) * Math.sin(2 * Math.PI * 4000 * tt) / 0.6124;
+      const x = off + tt * sr, i0 = Math.floor(x), f = x - i0; return (1 - f) * noise[i0] + f * noise[i0 + 1];
+    };
+    const env = tt => Math.min(1, tt / GATE_RAMP, (dur - tt) / GATE_RAMP);
+    for (let i = 0; i < N; i++) {
+      const t = i / sr, tl = t - dL, tr = t - dR;
+      L[i] = (tl < 0 || tl > dur) ? 0 : rms * gL * env(tl) * sig(tl);
+      R[i] = (tr < 0 || tr > dur) ? 0 : rms * gR * env(tr) * sig(tr);
+    }
+    return { L, R };
+  }
+  function toBuffer(sg) {
+    const ab = ctx.createBuffer(2, sg.L.length, ctx.sampleRate);
+    ab.getChannelData(0).set(sg.L); ab.getChannelData(1).set(sg.R); return ab;
+  }
+  function playBuf(ab, when, loop) {
+    const src = ctx.createBufferSource(); src.buffer = ab; src.loop = !!loop;
+    const g = ctx.createGain(); src.connect(g); g.connect(master); src.start(when); return { src, g };
+  }
+  function stopHandle(h) {
+    if (!h) return;
+    try { const t = ctx.currentTime; h.g.gain.cancelScheduledValues(t); h.g.gain.setTargetAtTime(0, t, 0.006); h.src.stop(t + 0.05); } catch (e) {}
+  }
 
-  // ---- volume check (continuous 1 kHz tone)
-  let volNode = null;
-  function stopVol() { if (!volNode) return; try { const t = ctx.currentTime; volNode.g.gain.setTargetAtTime(0, t, 0.02); volNode.o.stop(t + 0.15); } catch (e) {} volNode = null; el('btnVol').textContent = '音量あわせ（1000 Hz の音）'; }
-  el('btnVol').onclick = () => {
-    ensureAudio(); if (volNode) { stopVol(); return; }
-    const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = 1000; const g = ctx.createGain(); g.gain.value = 0; o.connect(g); g.connect(master); o.start();
-    g.gain.setTargetAtTime(Math.SQRT2 * Math.pow(10, levelDb(1000) / 20), ctx.currentTime, 0.03); volNode = { o, g }; el('btnVol').textContent = '■ 止める';
+  // ---- preparation sounds
+  function makeCheck(sr) {                           // left beep, then right beep
+    const N = Math.round(sr * 2.2), L = new Float32Array(N), R = new Float32Array(N), a = Math.SQRT2 * dbToGain(-34);
+    const beep = (arr, t0) => { const n0 = Math.round(t0 * sr), n1 = Math.round(0.55 * sr);
+      for (let i = 0; i < n1; i++) { const t = i / sr; arr[n0 + i] = a * Math.min(1, t / 0.03, (0.55 - t) / 0.03) * Math.sin(2 * Math.PI * 500 * t); } };
+    beep(L, 0.1); beep(R, 1.2); return { L, R };
+  }
+  el('btnCheck').onclick = () => {
+    ensureAudio(); playBuf(toBuffer(makeCheck(ctx.sampleRate)), ctx.currentTime + 0.05);
+    el('btnCheck').textContent = '① 左 → 右 の順に鳴りました（もう一度）';
   };
-  // ---- loop of  S -> V  pairs
-  let loopOn = false, nextT = 0, loopTimer = null, restartT = null;
-  function cycle() {
-    if (!loopOn) return;
-    const S = trials[idx].S, V = upperFreq(S, +el('adj').value), t0 = Math.max(nextT, ctx.currentTime + 0.05);
-    handles.push(tone(ctx, master, S, t0, TONE), tone(ctx, master, V, t0 + TONE + GAP, TONE)); handles = handles.slice(-6);
-    nextT = t0 + CYCLE; loopTimer = setTimeout(cycle, Math.max(30, (nextT - ctx.currentTime - 0.3) * 1000));
-  }
-  function stopHandles() { handles.forEach(h => { try { const t = ctx.currentTime; h.g.gain.cancelScheduledValues(t); h.g.gain.setTargetAtTime(0, t, 0.006); h.o.stop(t + 0.05); } catch (e) {} }); handles = []; }
-  function startLoop() { ensureAudio(); stopLoop(true); loopOn = true; nextT = ctx.currentTime + 0.1; cycle(); el('btnPlay').textContent = '■ 止める'; el('btnPlay').classList.add('amber'); }
-  function stopLoop(silent) { loopOn = false; if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; } if (restartT) { clearTimeout(restartT); restartT = null; } if (ctx) stopHandles(); if (!silent) { el('btnPlay').textContent = '▶ 聴く'; el('btnPlay').classList.remove('amber'); } }
-  function scheduleRestart() { if (!loopOn) return; if (restartT) clearTimeout(restartT); restartT = setTimeout(() => { restartT = null; if (!loopOn) return; clearTimeout(loopTimer); stopHandles(); nextT = ctx.currentTime + 0.05; cycle(); }, 250); }
+  let volH = null;
+  el('btnVol').onclick = () => {
+    ensureAudio();
+    if (volH) { stopHandle(volH); volH = null; el('btnVol').textContent = '② 音量あわせ（両耳に同じ音）'; return; }
+    const sr = ctx.sampleRate, n = sr * 2, nz = filteredNoise(sr), fade = Math.round(0.01 * sr), arr = new Float32Array(n), g = dbToGain(STIM.noise.base);
+    for (let i = 0; i < n; i++) arr[i] = nz[i];
+    for (let i = 0; i < fade; i++) { const w = i / fade; arr[i] = arr[i] * w + nz[n + i] * (1 - w); }   // seamless loop
+    for (let i = 0; i < n; i++) arr[i] *= g;
+    const ab = ctx.createBuffer(2, n, sr); ab.getChannelData(0).set(arr); ab.getChannelData(1).set(arr);
+    volH = playBuf(ab, ctx.currentTime + 0.05, true); el('btnVol').textContent = '■ 止める';
+  };
 
-  // ---- UI / experiment
-  let trials = [], idx = 0, results = [];
-  FREQS.forEach(f => { const b = document.createElement('button'); b.type = 'button'; b.dataset.f = f; b.textContent = f + ' Hz'; b.setAttribute('aria-pressed', sel.has(f) ? 'true' : 'false');
-    b.onclick = () => { if (sel.has(f)) { if (sel.size > 1) sel.delete(f); } else sel.add(f); el('freqSel').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', sel.has(+x.dataset.f) ? 'true' : 'false')); updCount(); }; el('freqSel').appendChild(b); });
-  function updCount() { const n = sel.size * STARTS.length * REPS; el('count').textContent = '試行は全部で ' + n + ' 回（約 ' + Math.max(1, Math.round(n * 0.35)) + ' 分）'; }
+  // ---------------- tabs ----------------
+  let tab = 'free';
+  function showTab(t) {
+    tab = t; stopFree(); stopVol();
+    document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.t === t ? 'true' : 'false'));
+    el('free').hidden = t !== 'free'; el('meas').hidden = t !== 'meas';
+    if (t === 'meas') { el('mSet').hidden = false; el('mTrial').hidden = true; el('mRes').hidden = true; }
+    window.scrollTo(0, 0);
+  }
+  function stopVol() { if (volH) el('btnVol').onclick(); }
+  document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => showTab(b.dataset.t));
+
+  // ---------------- free mode ----------------
+  let fStim = 't500';
+  const fmtI = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v);
+  function chipsSingle(container, keys, get, set, label) {
+    keys.forEach(k => { const b = document.createElement('button'); b.type = 'button'; b.dataset.k = k; b.textContent = label(k);
+      b.setAttribute('aria-pressed', get() === k ? 'true' : 'false');
+      b.onclick = () => { set(k); container.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.k === k ? 'true' : 'false')); }; container.appendChild(b); });
+  }
+  chipsSingle(el('stimF'), SORDER, () => fStim, k => { fStim = k; if (freeOn) { startFree(); } drawWave(); }, k => STIM[k].name);
+  function curCue() { return { itd: +el('itd').value, iid: +el('iid').value }; }
+  function updateVals() {
+    const c = curCue();
+    el('itdv').textContent = '時間差：' + (c.itd === 0 ? '0' : (c.itd > 0 ? '右耳が ' : '左耳が ') + Math.abs(c.itd) + ' μs 先') + (c.itd === 0 ? ' μs' : '');
+    el('iidv').textContent = '強度差：' + (c.iid === 0 ? '0 dB' : (c.iid > 0 ? '右耳が ' : '左耳が ') + Math.abs(c.iid) + ' dB 大きい');
+    drawWave(); scheduleRestart();
+  }
+  el('itd').addEventListener('input', updateVals); el('iid').addEventListener('input', updateVals);
+  el('btnZero').onclick = () => { el('itd').value = 0; el('iid').value = 0; updateVals(); };
+  let freeOn = false, freeH = [], loopT = null, nextT = 0, restartT = null;
+  function freeCycle() {
+    if (!freeOn) return;
+    const c = curCue(), ab = toBuffer(makeSignals(ctx.sampleRate, fStim, c.itd, c.iid, 0.7));
+    const t0 = Math.max(nextT, ctx.currentTime + 0.03);
+    freeH.push(playBuf(ab, t0)); freeH = freeH.slice(-3);
+    nextT = t0 + 1.1;
+    loopT = setTimeout(freeCycle, Math.max(30, (nextT - ctx.currentTime - 0.2) * 1000));
+  }
+  function startFree() {
+    ensureAudio(); stopFree(true); freeOn = true; nextT = ctx.currentTime + 0.05; freeCycle();
+    el('btnPlay').textContent = '■ 止める'; el('btnPlay').classList.add('amber');
+  }
+  function stopFree(silent) {
+    freeOn = false; if (loopT) { clearTimeout(loopT); loopT = null; } if (restartT) { clearTimeout(restartT); restartT = null; }
+    freeH.forEach(stopHandle); freeH = [];
+    if (!silent) { el('btnPlay').textContent = '▶ 鳴らす'; el('btnPlay').classList.remove('amber'); }
+  }
+  function scheduleRestart() {                      // apply slider changes quickly, without restarting on every tick
+    if (!freeOn) return; if (restartT) clearTimeout(restartT);
+    restartT = setTimeout(() => { restartT = null; if (!freeOn) return; clearTimeout(loopT); freeH.forEach(stopHandle); freeH = []; nextT = ctx.currentTime + 0.05; freeCycle(); }, 200);
+  }
+  el('btnPlay').onclick = () => { freeOn ? stopFree() : startFree(); };
+
+  // waveform picture (schematic of what reaches each ear)
+  const seedNoise = (() => { const a = []; let s = 7; for (let i = 0; i < 60; i++) { s = (s * 1103515245 + 12345) >>> 0; a.push([200 + (s % 4000), (s >>> 8) % 628 / 100]); } return a; })();
+  function sig(key, t) {
+    if (key === 't500') return Math.sin(2 * Math.PI * 500 * t);
+    if (key === 't4k') return Math.sin(2 * Math.PI * 4000 * t);
+    if (key === 'am4k') return (0.5 + 0.5 * Math.sin(2 * Math.PI * 100 * t)) * Math.sin(2 * Math.PI * 4000 * t);
+    let v = 0; seedNoise.forEach(([f, ph]) => { v += Math.sin(2 * Math.PI * f * t + ph); }); return v / 8;
+  }
+  function drawWave() {
+    const cv = el('wave'); const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = w * dpr; cv.height = h * dpr; const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+    const cue = curCue(), T = 0.006, N = 600, rowH = h / 2;
+    const dL = Math.max(0, cue.itd) / 1e6, dR = Math.max(0, -cue.itd) / 1e6, gL = dbToGain(-cue.iid / 2), gR = dbToGain(cue.iid / 2);
+    const mx = Math.max(gL, gR, 0.001) * 1.15;
+    [['左耳', dL, gL, '#0E6E8A'], ['右耳', dR, gR, '#D1782F']].forEach(([lab, d, g, col], r) => {
+      const mid = rowH * r + rowH / 2 + 2;
+      c.strokeStyle = '#C9D6DC'; c.lineWidth = 1; c.beginPath(); c.moveTo(34, mid); c.lineTo(w - 4, mid); c.stroke();
+      c.fillStyle = col; c.font = 'bold 12px system-ui, sans-serif'; c.textAlign = 'left'; c.fillText(lab, 2, mid + 4);
+      c.strokeStyle = col; c.lineWidth = 2; c.lineJoin = 'round'; c.beginPath();
+      for (let i = 0; i <= N; i++) { const t = (T * i) / N, v = g * sig(fStim, t - d) / mx; const x = 34 + (w - 38) * i / N, y = mid - v * (rowH / 2 - 6); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+      c.stroke();
+    });
+  }
+
+  // ---------------- measurement mode ----------------
+  const selCue = new Set(['itd']), selStim = new Set(['t500', 't4k']);
+  let trials = [], idx = 0, results = [], curH = null;
+  (function preset() {
+    const q = new URLSearchParams(location.search), m = q.get('mode');
+    const rp = +q.get('reps'); if (rp === 1 || rp === 2) REPS = rp;          // ?reps=1 : each condition once (half the trials)
+    if (m === 'itd') { selCue.clear(); selCue.add('itd'); selStim.clear(); ['t500', 't4k'].forEach(k => selStim.add(k)); }
+    else if (m === 'iid') { selCue.clear(); selCue.add('iid'); selStim.clear(); ['t500', 't4k'].forEach(k => selStim.add(k)); }
+    else if (m === 'duplex') { selCue.clear(); CORDER.forEach(k => selCue.add(k)); selStim.clear(); ['t500', 't4k'].forEach(k => selStim.add(k)); }
+    if (m === 'itd' || m === 'iid' || m === 'duplex') showTab('meas');
+  })();
+  function chipsMulti(container, keys, sel, label) {
+    keys.forEach(k => { const b = document.createElement('button'); b.type = 'button'; b.dataset.k = k; b.textContent = label(k);
+      b.setAttribute('aria-pressed', sel.has(k) ? 'true' : 'false');
+      b.onclick = () => { if (sel.has(k)) { if (sel.size > 1) sel.delete(k); } else sel.add(k);
+        container.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', sel.has(x.dataset.k) ? 'true' : 'false')); updCount(); };
+      container.appendChild(b); });
+  }
+  chipsMulti(el('cueM'), CORDER, selCue, k => CUE[k].name);
+  chipsMulti(el('stimM'), SORDER, selStim, k => STIM[k].name);
+  function updCount() { const n = selCue.size * selStim.size * 5 * REPS; el('count').textContent = '試行は全部で ' + n + ' 回（約 ' + Math.max(1, Math.round(n * 0.25)) + ' 分）'; }
   updCount();
-  const show = id => { ['scrStart', 'scrTrial', 'scrResult'].forEach(x => { el(x).hidden = x !== id; }); el('lead').hidden = id === 'scrResult'; window.scrollTo(0, 0); };
   function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   el('btnStart').onclick = () => {
-    ensureAudio(); stopVol(); const list = [];
-    FREQS.filter(f => sel.has(f)).forEach(S => STARTS.forEach(st => { for (let r = 0; r < REPS; r++) list.push({ S, start: st }); }));
-    trials = shuffle(list); idx = 0; results = []; show('scrTrial'); runTrial();
+    ensureAudio(); stopVol();
+    const list = [];
+    CORDER.filter(k => selCue.has(k)).forEach(cu => SORDER.filter(k => selStim.has(k)).forEach(st => CUE[cu].levels.forEach(lv => { for (let r = 0; r < REPS; r++) list.push({ cue: cu, stim: st, level: lv }); })));
+    trials = shuffle(list); idx = 0; results = [];
+    el('mSet').hidden = true; el('mTrial').hidden = false; el('mRes').hidden = true; runTrial();
   };
-  function runTrial() { el('prog').textContent = '試行 ' + (idx + 1) + ' / ' + trials.length; el('adj').value = trials[idx].start; startLoop(); }
-  el('adj').addEventListener('input', scheduleRestart);
-  document.querySelectorAll('.fine button').forEach(b => b.onclick = () => { const a = el('adj'); a.value = Math.min(+a.max, Math.max(+a.min, +a.value + +b.dataset.d)); scheduleRestart(); });
-  el('btnPlay').onclick = () => { loopOn ? stopLoop() : startLoop(); };
-  el('btnDecide').onclick = () => {
-    const t = trials[idx], pct = +el('adj').value; results.push({ S: t.S, start: t.start, pct, V: upperFreq(t.S, pct) });
-    stopLoop(); idx++; if (idx < trials.length) runTrial(); else showResults();
+  function playTrial() {
+    ensureAudio(); if (curH) { stopHandle(curH); curH = null; }
+    const t = trials[idx], itd = t.cue === 'itd' ? t.level : 0, iid = t.cue === 'iid' ? t.level : 0;
+    curH = playBuf(toBuffer(makeSignals(ctx.sampleRate, t.stim, itd, iid, 0.8)), ctx.currentTime + 0.08);
+  }
+  function runTrial() {
+    el('prog').textContent = '試行 ' + (idx + 1) + ' / ' + trials.length;
+    el('rate').value = 0; playTrial();
+  }
+  el('btnReplay').onclick = playTrial;
+  el('btnOk').onclick = () => {
+    const t = trials[idx]; results.push({ cue: t.cue, stim: t.stim, level: t.level, rating: +el('rate').value });
+    idx++; if (idx < trials.length) runTrial(); else showResults();
   };
 
-  const cents = r => 1200 * Math.log2(r), f1 = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1);
-  function showResults() {
-    show('scrResult'); const freqs = FREQS.filter(f => sel.has(f)), stat = {};
-    freqs.forEach(S => { const rs = results.filter(r => r.S === S), m = rs.reduce((a, r) => a + r.pct, 0) / rs.length; stat[S] = { m, rs }; });
-    let html = '<ul>';
-    freqs.forEach(S => { const m = stat[S].m, ratio = 2 * (1 + m / 100), c = cents(1 + m / 100);
-      const kind = m >= 0.5 ? ['', '広かった（伸長）'] : m <= -0.5 ? ['dn', '狭かった'] : ['eq', 'ほぼ同じだった'];
-      html += '<li><span class="ic ' + kind[0] + '">' + (m >= 0.5 ? '▲' : m <= -0.5 ? '▼' : '＝') + '</span><span><b>' + S + ' Hz</b>：1オクターブ上に聞こえた高さは，<b>' + ratio.toFixed(3) + ' 倍</b>（物理的オクターブ 2 倍より ' + f1(m) + '%，約 ' + Math.round(c) + ' セント）。物理的オクターブより<b>' + kind[1] + '</b>。</span></li>'; });
-    el('summary').innerHTML = html + '</ul>'; drawChart(freqs, stat);
-  }
-  function drawChart(freqs, stat) {
-    const cv = el('chart'), dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * dpr; cv.height = h * dpr;
-    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
-    const L = 40, R = 12, T = 12, B = 26, fa = 380, fb = 2800, all = results.map(r => r.pct);
-    const lo = Math.min(-3, Math.floor(Math.min(...all)) - 1), hi = Math.max(5, Math.ceil(Math.max(...all)) + 1);
-    const X = f => L + (w - L - R) * (Math.log(f / fa) / Math.log(fb / fa)), Y = v => T + (h - T - B) * (1 - (v - lo) / (hi - lo));
+  function drawChart(cv, cue, stims, means) {
+    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = w * dpr; cv.height = h * dpr; const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+    const L = 34, R = 24, T = 10, B = 24, lv = CUE[cue].levels, X = i => L + (w - L - R) * i / (lv.length - 1), Y = v => T + (h - T - B) * (1 - (v + 5) / 10);
     c.font = '11px system-ui, sans-serif'; c.fillStyle = '#7B8C96'; c.strokeStyle = '#C9D6DC'; c.lineWidth = 1; c.textAlign = 'right';
-    for (let v = Math.ceil(lo / 2) * 2; v <= hi; v += 2) { c.beginPath(); c.moveTo(L, Y(v)); c.lineTo(w - R, Y(v)); c.stroke(); c.fillText((v > 0 ? '+' : '') + v, L - 4, Y(v) + 4); }
-    c.textAlign = 'center'; [500, 1000, 2000].forEach(f => { c.beginPath(); c.moveTo(X(f), T); c.lineTo(X(f), h - B); c.stroke(); c.fillText(f >= 1000 ? f / 1000 + 'k' : String(f), X(f), h - 8); });
-    c.strokeStyle = '#7B8C96'; c.lineWidth = 2; c.setLineDash([5, 4]); c.beginPath(); c.moveTo(L, Y(0)); c.lineTo(w - R, Y(0)); c.stroke(); c.setLineDash([]);
-    c.fillStyle = '#7B8C96'; c.textAlign = 'right'; c.fillText('物理的オクターブ（2倍）', w - R - 4, Y(0) + 14);
-    freqs.forEach(S => { stat[S].rs.forEach((r, i) => { const dx = (r.start < 0 ? -1 : 1) * 4 + (i % 2) * 2; c.fillStyle = r.start < 0 ? 'rgba(14,110,138,0.55)' : 'rgba(209,120,47,0.55)'; c.beginPath(); c.arc(X(S) + dx, Y(r.pct), 4, 0, 7); c.fill(); }); });
-    c.strokeStyle = '#1A5276'; c.lineWidth = 2.5; c.beginPath(); freqs.forEach((S, i) => { i ? c.lineTo(X(S), Y(stat[S].m)) : c.moveTo(X(S), Y(stat[S].m)); }); c.stroke();
-    freqs.forEach(S => { c.fillStyle = '#1A5276'; c.beginPath(); c.arc(X(S), Y(stat[S].m), 5.5, 0, 7); c.fill(); });
+    [-5, 0, 5].forEach(v => { c.beginPath(); c.moveTo(L, Y(v)); c.lineTo(w - R, Y(v)); c.stroke(); c.fillText((v > 0 ? '+' : '') + v, L - 4, Y(v) + 4); });
+    c.textAlign = 'center'; lv.forEach((v, i) => c.fillText((v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v), X(i), h - 8));
+    c.textAlign = 'left'; c.fillText('右', 2, Y(5) + 4); c.fillText('左', 2, Y(-5) + 4);
+    stims.forEach(st => {
+      c.strokeStyle = COLORS[st]; c.fillStyle = COLORS[st]; c.lineWidth = 2.5; c.beginPath();
+      means[st].forEach((m, i) => { i ? c.lineTo(X(i), Y(m)) : c.moveTo(X(i), Y(m)); }); c.stroke();
+      means[st].forEach((m, i) => { c.beginPath(); c.arc(X(i), Y(m), 4, 0, 7); c.fill(); });
+    });
+  }
+  const f1 = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1);
+  function showResults() {
+    el('mTrial').hidden = true; el('mRes').hidden = false; window.scrollTo(0, 0);
+    const cues = CORDER.filter(k => selCue.has(k)), stims = SORDER.filter(k => selStim.has(k));
+    const stat = {};  // stat[cue][stim] = {means, span}
+    cues.forEach(cu => { stat[cu] = {}; stims.forEach(st => {
+      const means = CUE[cu].levels.map(lv => { const rs = results.filter(r => r.cue === cu && r.stim === st && r.level === lv); return rs.reduce((a, r) => a + r.rating, 0) / rs.length; });
+      stat[cu][st] = { means, span: means[means.length - 1] - means[0] };
+    }); });
+    let html = '<ul>';
+    cues.forEach(cu => stims.forEach(st => {
+      const sp = stat[cu][st].span, ab = Math.abs(sp), m = stat[cu][st].means;
+      const kind = ab >= 3 ? ['', '大きく動いた'] : ab >= 1.2 ? ['mid', '少し動いた'] : ['no', 'ほとんど動かなかった'];
+      html += '<li><span class="ic ' + kind[0] + '">' + (kind[0] === 'no' ? '×' : kind[0] === 'mid' ? '△' : '○') + '</span><span><b>' + STIM[st].name + '</b>は、' + CUE[cu].name + 'を変えると、頭の中の位置が<b>' + kind[1] + '</b>（左端の条件 ' + f1(m[0]) + ' → 右端の条件 ' + f1(m[m.length - 1]) + '）。</span></li>';
+    }));
+    el('summary').innerHTML = html + '</ul>';
+    const box = el('charts'); box.innerHTML = '';
+    cues.forEach(cu => {
+      const d = document.createElement('div'); d.className = 'res';
+      d.innerHTML = '<h3>' + CUE[cu].name + 'と、頭の中の位置（頭内定位）</h3><canvas style="height:170px"></canvas><div class="legend">' + stims.map(st => '<span><i style="background:' + COLORS[st] + '"></i>' + STIM[st].short + '</span>').join('') + '</div><div class="sub" style="margin:4px 0 0">横軸：' + CUE[cu].name + '（' + CUE[cu].unit + '、右が正）／縦軸：聞こえた位置（右が正）</div>';
+      box.appendChild(d);
+      const means = {}; stims.forEach(st => { means[st] = stat[cu][st].means; });
+      drawChart(d.querySelector('canvas'), cu, stims, means);
+    });
+    const li = ['ヘッドホンでは、音は頭の中に聞こえます（頭内定位）。ここで測ったのは、その頭の中の位置です。'];
+    if (selCue.has('itd')) li.push('時間差は、<b>低い音（500 Hz）</b>では位置を大きく動かし、<b>高い純音（4000 Hz）</b>では動かしにくいはずです（二重説）。');
+    if (selCue.has('iid')) li.push('強度差は、ヘッドホンでは、低い音でも高い音でも位置を動かします。ただし自然な環境で大きな強度差が生じるのは、高い音（頭の影）です。');
+    if (selStim.has('am4k')) li.push('4000 Hz の振幅変調音では、波形の包絡の時間差が手がかりになり、純音より位置が動きやすくなります。');
+    li.push('結果は、ヘッドホンの特性、聴取レベル、個人差で変わります。');
+    el('interp').innerHTML = '<b>見方</b><ul>' + li.map(t => '<li>' + t + '</li>').join('') + '</ul>';
   }
   el('btnCopy').onclick = () => {
-    const lines = ['standard_Hz,start,adjusted_Hz,deviation_pct']; results.forEach(r => lines.push([r.S, r.start < 0 ? 'from_below' : 'from_above', r.V.toFixed(2), r.pct.toFixed(2)].join(',')));
+    const lines = ['cue,stimulus,level,rating'];
+    results.forEach(r => lines.push([r.cue, STIM[r.stim].short, r.level, r.rating.toFixed(1)].join(',')));
     const txt = lines.join('\n'), ta = el('csv'); ta.value = txt; ta.hidden = false;
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => { el('btnCopy').textContent = 'コピーしました'; }).catch(() => ta.select()); else ta.select();
   };
-  el('btnAgain').onclick = () => { el('btnCopy').textContent = '結果をコピー（CSV）'; el('csv').hidden = true; show('scrStart'); };
-  document.addEventListener('visibilitychange', () => { if (document.hidden) stopLoop(); });
-  window.addEventListener('resize', () => { if (!el('scrResult').hidden && results.length) showResults(); });
-  window.__api = { upperFreq, levelDb, getTrial: () => trials[idx], setPct: v => { el('adj').value = v; }, ISO };
+  el('btnAgain').onclick = () => { el('btnCopy').textContent = '結果をコピー（CSV）'; el('csv').hidden = true; showTab('meas'); };
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { stopFree(); stopVol(); } });
+  window.addEventListener('resize', () => { drawWave(); });
+  updateVals();
+  window.__api = { makeSignals, STIM, ensure: ensureAudio, getCtx: () => ctx, getTrial: () => trials[idx], setRating: v => { el('rate').value = v; } };
 })();
 </script>
 </body>
