@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/33188242/README.md)
+[README.md](https://github.com/user-attachments/files/33476256/README.md)
 # 空間知覚の実験アプリ（時間差と強度差）
 
 ヘッドホンで、左右の耳に届く音の時間差（ITD）と強度差（IID）を変え、音の位置が動くかを確かめる、スマホ用の静的Webアプリです（`index.html` 1枚のみ、外部ライブラリなし）。
