@@ -59,6 +59,7 @@
 <div class="card" id="prep">
   <h2 style="margin-top:0">準備</h2>
   <button class="big ghost" id="btnCheck" type="button">① 左右のチェック（左→右の順に鳴ります）</button>
+  <label class="sub" style="display:block;margin:2px 0 8px"><input type="checkbox" id="swap"> 右→左の順に聞こえたら、ここをオン（左右を入れ替える）</label>
   <button class="big ghost" id="btnVol" type="button">② 音量あわせ（両耳に同じ音）</button>
   <p class="sub" style="margin:4px 0 0">音量は「小さめだがはっきり聞こえる」程度にして、このあとは変えないでください。</p>
 </div>
@@ -213,8 +214,9 @@
     return { L, R };
   }
   function toBuffer(sg) {
+    const sw = !!(el('swap') && el('swap').checked);               // ON: the earphones are reversed, so swap the two channels
     const ab = ctx.createBuffer(2, sg.L.length, ctx.sampleRate);
-    ab.getChannelData(0).set(sg.L); ab.getChannelData(1).set(sg.R); return ab;
+    ab.getChannelData(0).set(sw ? sg.R : sg.L); ab.getChannelData(1).set(sw ? sg.L : sg.R); return ab;
   }
   function playBuf(ab, when, loop) {
     const src = ctx.createBufferSource(); src.buffer = ab; src.loop = !!loop;
@@ -232,6 +234,8 @@
       for (let i = 0; i < n1; i++) { const t = i / sr; arr[n0 + i] = a * Math.min(1, t / 0.03, (0.55 - t) / 0.03) * Math.sin(2 * Math.PI * 500 * t); } };
     beep(L, 0.1); beep(R, 1.2); return { L, R };
   }
+  try { el('swap').checked = localStorage.getItem('spatialSwap') === '1'; } catch (e) {}
+  el('swap').onchange = () => { try { localStorage.setItem('spatialSwap', el('swap').checked ? '1' : '0'); } catch (e) {} };
   el('btnCheck').onclick = () => {
     ensureAudio(); playBuf(toBuffer(makeCheck(ctx.sampleRate)), ctx.currentTime + 0.05);
     el('btnCheck').textContent = '① 左 → 右 の順に鳴りました（もう一度）';
